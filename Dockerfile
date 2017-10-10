@@ -13,11 +13,13 @@ RUN echo 'deb http://cdn-fastly.deb.debian.org/debian jessie-backports main' > /
     rm /etc/apt/sources.list.d/jessie-backports.list && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
 RUN cd /tmp && \
         wget -q http://d3kbcqa49mib13.cloudfront.net/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
         echo "3fc94096ae34f9a1a148d37e5ed640a7e5de1812f1f2ecd715d92bbf2901e895cf4b93e6d8ee0d64debb5df7c56d673c0a36e5fc49503ec0f4507eb0edf961a4 *spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" | sha512sum -c - && \
         tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local && \
         rm spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
+
 RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} spark
 
 # Mesos dependencies
@@ -31,7 +33,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E56151BF && \
     rm -rf /var/lib/apt/lists/*
 
 # Add missing libraries for sparklyr
-RUN apt-get install -y libxml2 libxml2-dev
+RUN apt-get update -y && apt-get install -y libxml2 libxml2-dev
 
 # Spark and Mesos config
 ENV SPARK_HOME /usr/local/spark
@@ -40,4 +42,16 @@ ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M -
 
 RUN R -e "install.packages('sparklyr', repos='http://cran.rstudio.com/', dependencies=T)"
 
-USER $NB_USER
+# Install Saagie's RStudio Addin
+RUN R -e "install.packages('devtools')" && \
+  R -e "devtools::install_github('saagie/rstudio-saagie-addin')"
+
+# Be sure rstudio user has full access to his home directory
+RUN mkdir -p /home/rstudio && \
+  chown -R rstudio:rstudio /home/rstudio && \
+  chmod -R 755 /home/rstudio
+
+ADD ./init_rstudio.sh /
+RUN chmod 500 /init_rstudio.sh
+
+CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
