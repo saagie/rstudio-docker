@@ -30,6 +30,9 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E56151BF && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Add missing libraries for sparklyr
+RUN apt-get install -y libxml2 libxml2-dev
+
 # Spark and Mesos config
 ENV SPARK_HOME /usr/local/spark
 ENV MESOS_NATIVE_LIBRARY /usr/local/lib/libmesos.so
