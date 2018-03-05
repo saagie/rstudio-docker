@@ -1,6 +1,6 @@
 # RStudio Server - customized by Saagie
 
-This image is based on official [rocker/rstudio](https://hub.docker.com/r/rocker/rstudio/) image.
+This image is based on official [rocker/tidyverse](https://hub.docker.com/r/rocker/tidyverse/) image.
 It adds a few feature, such as:
 * [sparklyr](https://spark.rstudio.com/index.html): Connect to [Spark](http://spark.apache.org/) from R
 * [Saagie Add-in](https://github.com/saagie/rstudio-saagie-addin): allows you to push R jobs to Saagie's platform
