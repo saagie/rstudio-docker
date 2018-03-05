@@ -1,6 +1,37 @@
 #!/bin/bash
 
-echo "Init RStudio"
+# Grab runtime parameters
+TEMP=`getopt -o p: --long port: -- "$@"`
+eval set -- "$TEMP"
+
+while true ; do
+  case "$1" in
+    -p|--port)
+      case "$2" in
+        "") shift 2 ;;
+        *) PORT=$2 ; shift 2 ;;
+      esac ;;
+    --) shift ; break ;;
+    *) echo "Internal error!" ; exit 1 ;;
+  esac
+done
+
+# check if rstudio needs to be run on a custom port
+if [ -z $PORT ];
+then
+  echo "INFO: no port given. RStudio will run on default port (8787)."
+  export PORT0=8787
+else
+  # If not already set, set a fake PORT0 variable (used in spark-env.sh)
+  if [ -z $PORT0 ]
+  then
+    export PORT0=$(( $PORT+1 ))
+    echo "WARNING: no PORT0 environment variable provided. $PORT0 will be used..."
+  fi
+  echo "www-port=$PORT" >> /etc/rstudio/rserver.conf
+fi
+
+echo "Running RStudio on port $PORT"
 
 /init &
 
