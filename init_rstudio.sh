@@ -9,7 +9,7 @@ while true ; do
     -p|--port)
       case "$2" in
         "") shift 2 ;;
-        *) PORT=$2 ; shift 2 ;;
+        *) RSTUDIO_PORT=$2 ; shift 2 ;;
       esac ;;
     --) shift ; break ;;
     *) echo "Internal error!" ; exit 1 ;;
@@ -17,21 +17,22 @@ while true ; do
 done
 
 # check if rstudio needs to be run on a custom port
-if [ -z $PORT ];
+if [ -z $RSTUDIO_PORT ];
 then
   echo "INFO: no port given. RStudio will run on default port (8787)."
   export PORT0=8787
+  export RSTUDIO_PORT=8787
 else
   # If not already set, set a fake PORT0 variable (used in spark-env.sh)
   if [ -z $PORT0 ]
   then
-    export PORT0=$(( $PORT+1 ))
+    export PORT0=$(( $RSTUDIO_PORT+1 ))
     echo "WARNING: no PORT0 environment variable provided. $PORT0 will be used..."
   fi
-  echo "www-port=$PORT" >> /etc/rstudio/rserver.conf
+  echo "www-port=$RSTUDIO_PORT" >> /etc/rstudio/rserver.conf
 fi
 
-echo "Running RStudio on port $PORT"
+echo "Running RStudio on port $RSTUDIO_PORT"
 
 /init &
 
