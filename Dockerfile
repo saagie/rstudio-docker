@@ -95,7 +95,7 @@ RUN R -e "install.packages('changepoint')"
 RUN R -e "install.packages('mvoutlier')"
 RUN R -e "install.packages('shinydashboard')"
 RUN R -e "install.packages('FNN')"
-
+RUN R -e "install.packages('plotly')"
 
 # Be sure rstudio user has full access to his home directory
 RUN mkdir -p /home/rstudio && \
