@@ -187,4 +187,24 @@ RUN mkdir -p /home/rstudio && \
 ADD ./init_rstudio.sh /
 RUN chmod 500 /init_rstudio.sh
 
+# JAVA_HOME define
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Hadoop client installation
+RUN wget --no-verbose http://archive-primary.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.7.1.tar.gz \
+&& tar -xzf hadoop-2.6.0-cdh5.7.1.tar.gz \
+&& rm hadoop-2.6.0-cdh5.7.1.tar.gz \
+&& mv hadoop-2.6.0-cdh5.7.1 /usr/local/hadoop
+ENV HADOOP_HOME=/usr/local/hadoop
+ENV PATH=$PATH:$HADOOP_HOME/bin
+
+# Hive client installation
+RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hive-1.2.2/apache-hive-1.2.2-bin.tar.gz \
+&& tar -xvzf apache-hive-1.2.2-bin.tar.gz \
+&& rm apache-hive-1.2.2-bin.tar.gz \
+&& cd apache-hive-1.2.2-bin
+ENV HIVE_HOME=/apache-hive-1.2.2-bin
+ENV PATH=$HIVE_HOME/bin:$PATH
+
 CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
