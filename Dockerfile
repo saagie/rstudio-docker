@@ -46,6 +46,8 @@ RUN R -e "install.packages('sparklyr', repos='http://cran.rstudio.com/', depende
 RUN R -e "install.packages('devtools')" && \
   R -e "devtools::install_github('saagie/rstudio-saagie-addin')"
 
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
 # Install R packages
 RUN R CMD javareconf && R -e "install.packages('rJava')" && \
  R -e "install.packages('odbc')" && \
@@ -188,7 +190,6 @@ ADD ./init_rstudio.sh /
 RUN chmod 500 /init_rstudio.sh
 
 # JAVA_HOME define
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Hadoop client installation
@@ -205,6 +206,7 @@ RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hiv
 && rm apache-hive-1.2.2-bin.tar.gz \
 && cd apache-hive-1.2.2-bin
 ENV HIVE_HOME=/apache-hive-1.2.2-bin
-ENV PATH=$HIVE_HOME/bin:$PATH
+ENV PATH=/apache-hive-1.2.2-bin/bin:$PATH
+
 
 CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
