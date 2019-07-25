@@ -83,5 +83,16 @@ then
     done
 fi
 
+# propagate environment variables to every user
+R_HOME=$(Rscript -e 'Sys.getenv("R_HOME")' | sed -rn 's/^\[[[:digit:]]+\] "(.*)"/\1/p')
+
+env | while read VAR
+do
+  if ! grep -q "$VAR" /ROOT_ENV_VAR
+  then
+    echo $VAR >> $R_HOME/etc/Renviron.site
+  fi
+done
+
 # keep the container running...
 tail -f /dev/null
