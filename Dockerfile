@@ -193,7 +193,7 @@ RUN chmod 500 /init_rstudio.sh
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Hadoop client installation
-RUN wget --no-verbose http://archive-primary.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.7.1.tar.gz \
+RUN wget --no-verbose http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.7.1.tar.gz \
 && tar -xzf hadoop-2.6.0-cdh5.7.1.tar.gz \
 && rm hadoop-2.6.0-cdh5.7.1.tar.gz \
 && mv hadoop-2.6.0-cdh5.7.1 /usr/local/hadoop
@@ -208,5 +208,7 @@ RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hiv
 ENV HIVE_HOME=/apache-hive-1.2.2-bin
 ENV PATH=/apache-hive-1.2.2-bin/bin:$PATH
 
+# Store Root envvar to be able to exclude it at runtime when propagating envvars to every user
+RUN env >> /ROOT_ENV_VAR && chmod 400 /ROOT_ENV_VAR
 
 CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
