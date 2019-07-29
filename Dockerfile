@@ -206,7 +206,7 @@ RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hiv
 && rm apache-hive-1.2.2-bin.tar.gz \
 && cd apache-hive-1.2.2-bin
 ENV HIVE_HOME=/apache-hive-1.2.2-bin
-ENV PATH=/apache-hive-1.2.2-bin/bin:$PATH
+ENV PATH=$HIVE_HOME/bin:$PATH
 
 # Store Root envvar to be able to exclude it at runtime when propagating envvars to every user
 RUN env >> /ROOT_ENV_VAR && chmod 400 /ROOT_ENV_VAR
