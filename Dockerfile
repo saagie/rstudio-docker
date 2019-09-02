@@ -26,18 +26,9 @@ RUN cd /tmp && \
 
 RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} spark
 
-# Mesos dependencies
-RUN DISTRO=debian && \
-    CODENAME=stretch && \
-    echo "deb http://repos.mesosphere.io/${DISTRO} ${CODENAME} main" > /etc/apt/sources.list.d/mesosphere.list && \
-    apt-get -y update && \
-    apt-get --no-install-recommends -y --force-yes install mesos=1.3.1-2.0.1 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
-# Spark and Mesos config
+# Spark config
 ENV SPARK_HOME /usr/local/spark
-ENV MESOS_NATIVE_LIBRARY /usr/local/lib/libmesos.so
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
 
 RUN R -e "install.packages('sparklyr', repos='http://cran.rstudio.com/', dependencies=T)"
@@ -210,5 +201,18 @@ ENV PATH=$HIVE_HOME/bin:$PATH
 
 # Store Root envvar to be able to exclude it at runtime when propagating envvars to every user
 RUN env >> /ROOT_ENV_VAR && chmod 400 /ROOT_ENV_VAR
+
+# Nginx
+RUN apt-get update \
+  && apt-get install -y nginx \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/
+
+COPY server.conf /etc/nginx/sites-enabled/rstudio.conf
+RUN rm /etc/nginx/sites-enabled/default
+
+EXPOSE 80
+ADD entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
