@@ -208,6 +208,11 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/
 
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt update -qq && apt install -yqq --no-install-recommends \
+      krb5-user && \
+    rm -rf /var/lib/apt/lists/*;
+
 COPY server.conf /etc/nginx/sites-enabled/rstudio.conf
 RUN rm /etc/nginx/sites-enabled/default
 
