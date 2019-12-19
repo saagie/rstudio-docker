@@ -193,7 +193,7 @@ RUN chmod 500 /init_rstudio.sh
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Hadoop client installation
-RUN wget --no-verbose http://archive-primary.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.7.1.tar.gz \
+RUN wget --no-verbose http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.7.1.tar.gz \
 && tar -xzf hadoop-2.6.0-cdh5.7.1.tar.gz \
 && rm hadoop-2.6.0-cdh5.7.1.tar.gz \
 && mv hadoop-2.6.0-cdh5.7.1 /usr/local/hadoop
@@ -207,6 +207,23 @@ RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hiv
 && cd apache-hive-1.2.2-bin
 ENV HIVE_HOME=/apache-hive-1.2.2-bin
 ENV PATH=/apache-hive-1.2.2-bin/bin:$PATH
+
+#Kerberos libs
+ENV DEBIAN_FRONTEND noninteractive
+RUN DISTRO=debian && \
+    CODENAME=stretch && \
+    echo "deb [trusted=yes] http://repos.mesosphere.io/${DISTRO} ${CODENAME} main" > /etc/apt/sources.list.d/mesosphere.list && \
+    apt update -qq && apt install -yqq --no-install-recommends \
+    krb5-user \
+    libsasl2-modules-gssapi-mit && \
+    rm -rf /var/lib/apt/lists/*;
+RUN R -e "install.packages('getPass')"
+
+# Hive ODBC dependency
+RUN cd /tmp && \
+wget --no-verbose https://downloads.cloudera.com/connectors/ClouderaHive_ODBC_2.6.4.1004/Debian/clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
+dpkg -i clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
+odbcinst -i -d -f /opt/cloudera/hiveodbc/Setup/odbcinst.ini
 
 
 CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
