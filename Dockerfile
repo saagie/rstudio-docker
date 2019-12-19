@@ -225,5 +225,7 @@ wget --no-verbose https://downloads.cloudera.com/connectors/ClouderaHive_ODBC_2.
 dpkg -i clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
 odbcinst -i -d -f /opt/cloudera/hiveodbc/Setup/odbcinst.ini
 
+# Store Root envvar to be able to exclude it at runtime when propagating envvars to every user
+RUN env >> /ROOT_ENV_VAR && chmod 400 /ROOT_ENV_VAR
 
 CMD ["/bin/sh", "-c", "/init_rstudio.sh"]
