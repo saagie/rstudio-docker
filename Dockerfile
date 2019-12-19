@@ -206,7 +206,7 @@ RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hiv
 && rm apache-hive-1.2.2-bin.tar.gz \
 && cd apache-hive-1.2.2-bin
 ENV HIVE_HOME=/apache-hive-1.2.2-bin
-ENV PATH=/apache-hive-1.2.2-bin/bin:$PATH
+ENV PATH=$HIVE_HOME/bin:$PATH
 
 #Kerberos libs
 ENV DEBIAN_FRONTEND noninteractive

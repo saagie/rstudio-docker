@@ -47,7 +47,7 @@ chown -R rstudio:rstudio /home/rstudio
 chmod -R 755 /home/rstudio
 
 # create an admin user who will be able to create new users directly from RStudio IDE
-useradd admin --home /home/admin --create-home -p $(openssl passwd -1 rstudioadmin) --groups sudo,shadow,rstudio
+useradd admin --home /home/admin --create-home -p $(openssl passwd -1 rstudioadmin) --groups sudo,shadow,rstudio,staff
 
 # Add backupusers script for admin user
 mkdir -p /home/admin
@@ -82,6 +82,17 @@ then
 
     done
 fi
+
+# propagate environment variables to every user
+R_HOME=$(Rscript -e 'Sys.getenv("R_HOME")' | sed -rn 's/^\[[[:digit:]]+\] "(.*)"/\1/p')
+
+env | while read VAR
+do
+  if ! grep -q "$VAR" /ROOT_ENV_VAR
+  then
+    echo $VAR >> $R_HOME/etc/Renviron.site
+  fi
+done
 
 # keep the container running...
 tail -f /dev/null
