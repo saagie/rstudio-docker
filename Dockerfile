@@ -208,6 +208,21 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/
 
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt update -qq && apt install -yqq --no-install-recommends \
+      krb5-user && \
+    rm -rf /var/lib/apt/lists/*;
+
+# Install Hive ODBC driver
+RUN apt update -qq && apt install -yqq --no-install-recommends \
+      libsasl2-modules-gssapi-mit && \
+    rm -rf /var/lib/apt/lists/* && \
+    cd /tmp && \
+    wget --no-verbose https://downloads.cloudera.com/connectors/ClouderaHive_ODBC_2.6.4.1004/Debian/clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
+    dpkg -i clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
+    odbcinst -i -d -f /opt/cloudera/hiveodbc/Setup/odbcinst.ini && \
+    rm /tmp/clouderahiveodbc_2.6.4.1004-2_amd64.deb
+
 COPY server.conf /etc/nginx/sites-enabled/rstudio.conf
 RUN rm /etc/nginx/sites-enabled/default
 
