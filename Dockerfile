@@ -208,6 +208,23 @@ RUN wget --no-verbose http://apache.mirrors.ovh.net/ftp.apache.org/dist/hive/hiv
 ENV HIVE_HOME=/apache-hive-1.2.2-bin
 ENV PATH=$HIVE_HOME/bin:$PATH
 
+RUN R -e "install.packages('getPass')"
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
+      krb5-user && \
+    rm -rf /var/lib/apt/lists/*;
+
+# Install Hive ODBC driver
+RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
+      libsasl2-modules-gssapi-mit && \
+    rm -rf /var/lib/apt/lists/* && \
+    cd /tmp && \
+    wget --no-verbose https://downloads.cloudera.com/connectors/ClouderaHive_ODBC_2.6.4.1004/Debian/clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
+    dpkg -i clouderahiveodbc_2.6.4.1004-2_amd64.deb && \
+    odbcinst -i -d -f /opt/cloudera/hiveodbc/Setup/odbcinst.ini && \
+    rm /tmp/clouderahiveodbc_2.6.4.1004-2_amd64.deb
+
 # Store Root envvar to be able to exclude it at runtime when propagating envvars to every user
 RUN env >> /ROOT_ENV_VAR && chmod 400 /ROOT_ENV_VAR
 
