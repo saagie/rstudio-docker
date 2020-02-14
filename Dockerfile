@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:3.4.2
+FROM rocker/tidyverse:3.6.2
 
 USER root
 
@@ -7,24 +7,28 @@ ENV APACHE_SPARK_VERSION 2.1.0
 ENV HADOOP_VERSION 2.7
 
 # Install system libraries required by R packages
-RUN apt-get -y update  && apt-get install -y libcups2 libcups2-dev openjdk-8-jdk systemd \
-    unixodbc-dev libbz2-dev libgsl-dev odbcinst libx11-dev mesa-common-dev libglu1-mesa-dev \
-    gdal-bin proj-bin libgdal-dev libproj-dev libudunits2-dev libtcl8.6 libtk8.6 libgtk2.0-dev && \
-    apt-get clean
+RUN apt-get update -qq \
+    && apt-get install -yqq --no-install-recommends \ 
+        libcups2 libcups2-dev openjdk-11-jdk systemd \
+        unixodbc-dev libbz2-dev libgsl-dev odbcinst libx11-dev mesa-common-dev libglu1-mesa-dev \
+        gdal-bin proj-bin libgdal-dev libproj-dev libudunits2-dev libtcl8.6 libtk8.6 libgtk2.0-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Impala ODBC dependency
-RUN cd /tmp && \
-    wget --no-verbose https://downloads.cloudera.com/connectors/impala_odbc_2.5.41.1029/Debian/clouderaimpalaodbc_2.5.41.1029-2_amd64.deb && \
-    dpkg -i clouderaimpalaodbc_2.5.41.1029-2_amd64.deb && \
-    odbcinst -i -d -f /opt/cloudera/impalaodbc/Setup/odbcinst.ini
+RUN cd /tmp \
+    && wget --no-verbose https://downloads.cloudera.com/connectors/impala_odbc_2.5.41.1029/Debian/clouderaimpalaodbc_2.5.41.1029-2_amd64.deb \
+    && dpkg -i clouderaimpalaodbc_2.5.41.1029-2_amd64.deb \
+    && \odbcinst -i -d -f /opt/cloudera/impalaodbc/Setup/odbcinst.ini
 
 # Install Spark
-RUN cd /tmp && \
-    wget -q https://archive.apache.org/dist/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
-    tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local && \
-    rm spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
+RUN cd /tmp \
+    && wget -q https://archive.apache.org/dist/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz \
+    && tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local \
+    && rm spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
 
-RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} spark
+RUN cd /usr/local \
+    && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} spark
 
 
 # Spark config
@@ -37,7 +41,7 @@ RUN R -e "install.packages('sparklyr', repos='http://cran.rstudio.com/', depende
 RUN R -e "install.packages('devtools')" && \
   R -e "devtools::install_github('saagie/rstudio-saagie-addin')"
 
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 # Install R packages
 RUN R CMD javareconf && R -e "install.packages('rJava')" && \

@@ -9,7 +9,7 @@ pipeline {
         stage('Build Rstudio image') {
             steps {
                 script {
-                    sh "docker build -t saagie/rstudio:v2 ."
+                    sh "./build.sh saagie/r-studio:v2_3.6.2"
                 }
             }
         }
@@ -23,7 +23,7 @@ pipeline {
                 passwordVariable: 'PASSWORD')]) {
                         
                         sh "docker login -u $USERNAME -p $PASSWORD"
-                        sh "docker push saagie/rstudio:v2"
+                        sh "docker push saagie/r-studio:v2_3.6.2"
                     }
                 }
             }
