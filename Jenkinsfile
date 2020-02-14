@@ -9,7 +9,7 @@ pipeline {
         stage('Build Rstudio image') {
             steps {
                 script {
-                    sh "docker build -t saagie/rstudio:v2 ."
+                    sh "./build.sh saagie/r-studio:v2_3.6.2"
                 }
             }
         }
