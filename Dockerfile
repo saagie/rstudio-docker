@@ -188,10 +188,10 @@ RUN chmod 500 /init_rstudio.sh
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Hadoop client installation
-RUN wget --no-verbose http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.7.1.tar.gz \
-&& tar -xzf hadoop-2.6.0-cdh5.7.1.tar.gz \
-&& rm hadoop-2.6.0-cdh5.7.1.tar.gz \
-&& mv hadoop-2.6.0-cdh5.7.1 /usr/local/hadoop
+RUN wget --no-verbose http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.13.0.tar.gz \
+&& tar -xzf hadoop-2.6.0-cdh5.13.0.tar.gz \
+&& rm hadoop-2.6.0-cdh5.13.0.tar.gz \
+&& mv hadoop-2.6.0-cdh5.13.0 /usr/local/hadoop
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV PATH=$PATH:$HADOOP_HOME/bin
 
